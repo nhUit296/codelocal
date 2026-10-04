@@ -1135,10 +1135,12 @@ func (e *Engine) Handle(ctx context.Context, tool string, args map[string]any, o
 	return result, nil
 }
 
-func (e *Engine) handle(ctx context.Context, tool string, args map[string]any, opts HandleOptions) (any, error) {
+func (e *Engine) handle(ctx context.Context, tool string, args map[string]any, opts HandleOptions) (result any, retErr error) {
 	if args == nil {
 		args = map[string]any{}
 	}
+	telemetry := e.beginBrowserBrainTelemetry(tool, args, opts)
+	defer func() { e.finishBrowserBrainTelemetry(telemetry, result, retErr) }()
 	audit.Write(audit.Event{Event: "tool.call", RequestID: opts.RequestID, MCPSessionID: opts.SessionID, WorkspaceKey: e.WorkspaceKey, Tool: tool, Detail: args})
 	if result, handled, err := e.handleCodeIntelligence(ctx, tool, args); handled {
 		return result, err
