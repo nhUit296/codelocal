@@ -90,3 +90,16 @@ func TestBrowserBrainTelemetryEmitsStartedAndCompleted(t *testing.T) {
 		t.Fatalf("workspace key missing: %#v", seen["completed"])
 	}
 }
+
+func TestBrowserBrainTelemetryKeyNormalization(t *testing.T) {
+	for _, key := range []string{"oldText", "old_text", "newText", "new_text", "request_payload", "stdin"} {
+		if !browserBrainSizeOnlyKey(key) {
+			t.Fatalf("expected %q to be size-only", key)
+		}
+	}
+	for _, key := range []string{"command", "detail", "text", "shell_command"} {
+		if !browserBrainCommandKey(key) {
+			t.Fatalf("expected %q to be command-like", key)
+		}
+	}
+}

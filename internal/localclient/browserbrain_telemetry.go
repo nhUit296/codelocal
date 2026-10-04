@@ -258,19 +258,17 @@ func browserBrainSensitiveKey(key string) bool {
 }
 
 func browserBrainSizeOnlyKey(key string) bool {
-	switch strings.ToLower(strings.TrimSpace(key)) {
-	case "content", "patch", "input", "oldtext", "newtext":
-		return true
-	default:
-		return false
+	normalized := strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(strings.TrimSpace(key), "-", "_"), " ", "_"))
+	compact := strings.ReplaceAll(normalized, "_", "")
+	for _, marker := range []string{"content", "patch", "input", "oldtext", "newtext", "stdin", "body", "payload"} {
+		if compact == marker || strings.HasSuffix(compact, marker) {
+			return true
+		}
 	}
+	return false
 }
 
 func browserBrainCommandKey(key string) bool {
-	switch strings.ToLower(strings.TrimSpace(key)) {
-	case "command", "query", "detail":
-		return true
-	default:
-		return false
-	}
+	normalized := strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(strings.TrimSpace(key), "-", "_"), " ", "_"))
+	return normalized == "command" || normalized == "query" || normalized == "text" || normalized == "detail" || strings.HasSuffix(normalized, "_command")
 }
